@@ -91,7 +91,7 @@ function makeThumbs($source,$dest,&$fails) { //make thumbnails
 ?>
 <!DOCTYPE html>
 <html lang=en><head><meta charset=utf-8 />
-<title>Image Gallary</title>
+<title>Image Gallary Generator</title>
 <link rel=icon href=/favicon.ico /><meta name=theme-color content="#222">
 <meta name=viewport content="width=device-width">
 <style>
@@ -157,7 +157,7 @@ function newAlbum() { //create album
         if(fails.length > 1)
           document.getElementById('container').innerHTML += '<h2>Failed Images</h2>'+fails;
       }
-      else alert('connection fail');
+      else alert('Connection closed\nhttp return code: '+this.status+'\n(0 means nginx/apache timeout. see readme.)');
     }
   }
   xhttp.open('POST','generator.php',true);
@@ -165,7 +165,7 @@ function newAlbum() { //create album
   xhttp.send('imgdir='+encodeURIComponent(imgdir)+'&aname='+encodeURIComponent(aname)+'&genthumbs=1');
 
   var msg = document.createElement('p');
-  msg.innerHTML = 'This may take several minutes or longer if you have a large collection.<br>If you navigate away from this page, thumbnail creation WILL continue server-side.';
+  msg.innerHTML = 'This may take several minutes or longer if you have a large collection.<br>Do not close this page';
   document.getElementById('main').insertAdjacentElement('beforeend',msg);
   return false;
 }
