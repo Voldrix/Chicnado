@@ -27,16 +27,26 @@ On mobile there is a swipe gesture for cycling the fullview image.\
 There are also button controls for the fullview image viewer. Clicking the grayed-out background also closes the image.\
 You can manually cycle images while the carousel is on.
 
+### Nginx timeout
+If thumbnail generation takes longer than 5min, nginx may close the connection. Add this setting to your site's config to increase the timeout to one hour.\
+`proxy_read_timeout 3600;`
+
+PHP will not timeout, because the timeout is overwritten in the code.
+
 ### Security
 After you've added your galleries, __delete generator.php__\
 You can always re-downloaded it, but if you leave it on there, anyone can use it to access any files your web server user has access to.
 
 ## How it Works
-The generator will create two directories, _galleries_ and _thumbnails_. Every gallery you make will be a symlink under _galleries_. If you generate thumbnails, they will be in a folder by the same name under _thumbnails_. Otherwise it will be a duplicate symlink under _thumbnails_.\
-If there is no thumbnail for an image, the viewer will use the original for the thumbnail. This can happen if the image has the wrong file type extension, or the thumbnail was deleted, or a new image was added to the source folder. You will be able to identify these issues because the image will be given a <u>red border</u>.\
+The generator will create two directories, _galleries_ and _thumbnails_. Every gallery you make will be a symlink under _galleries_. If you generate thumbnails, they will be in a folder by the same name under _thumbnails_. Otherwise it will be a duplicate symlink under _thumbnails_.
+
+If there is no thumbnail for an image, the viewer will use the original for the thumbnail. This can happen if the image has the wrong file type extension, or the thumbnail was deleted, or a new image was added to the source folder. You will be able to identify these issues because the image will be given a <u>red border</u>.
+
 The viewer gets the file list from the source folder, so any changes you make will show up instantly.\
-Any non-images in the source directory will show up as broken images.\
-Images shorter than the default thumbnail height (268px) will be copied -not transcoded- into a thumbnail.
+
+Any non-images in the source directory will show up as broken images.
+
+Images shorter than the thumbnail height (default 268px) will be copied -not transcoded- into a thumbnail.
 
 ## Pictures
 The top left breadcrumb pagination starts with the album name.\
