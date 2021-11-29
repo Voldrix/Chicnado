@@ -5,7 +5,7 @@ var imgIndex = 1, carousel, paused = false;
 
 viewerbg.addEventListener('click',function(event) {if (event.target.id === 'vwr') {fullscreen(0); viewer('none');}},false); //click background to close viewer
 document.addEventListener('keydown',event => {
-  if (event.repeat) return;
+  if (event.repeat || viewerbg.style.display !== 'flex') return;
   switch(event.key) {
     case "Escape": fullscreen(0); viewer('none');break;
     case "ArrowLeft": turnPage(-1);break;
@@ -17,9 +17,11 @@ document.addEventListener('keydown',event => {
 
 function viewer(openOrClose,pageNum=1) {
   viewerbg.style.display = openOrClose;
-  imgIndex = pageNum;
   clearInterval(carousel); paused = false;
-  turnPage(0);
+  if(openOrClose === 'flex') { //open
+    imgIndex = pageNum;
+    turnPage(0);
+  }
 }
 
 function turnPage(previousOrNext) {
