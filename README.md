@@ -1,8 +1,11 @@
 # Chicnado
 ### _Minimalist, pure PHP, static image gallery_
+No external libraries!\
+Only uses PHP-GD extension (if you generate thumbnails).\
+Simple as `apt-get install php-gd` 
 
 ## Features
-- __No dependancies!__
+- __No external dependancies!__
 - Optional thumbnail generation
 - Minimal code base (easy to edit)
 - Read-only interface has no UI clutter
@@ -42,7 +45,7 @@ The generator will create two directories, _galleries_ and _thumbnails_. Every g
 
 If there is no thumbnail for an image, the viewer will use the original for the thumbnail. This can happen if the image has the wrong file type extension, or the thumbnail was deleted, or a new image was added to the source folder. You will be able to identify these issues because the image will be given a <u>red border</u>.
 
-The viewer gets the file list from the source folder, so any changes you make will show up instantly.\
+The viewer gets the file list from the source folder, so any changes you make will show up instantly.
 
 Any non-images in the source directory will show up as broken images.
 
@@ -50,11 +53,10 @@ Images shorter than the thumbnail height (default 268px) will be copied -not tra
 
 ## Pictures
 The top left breadcrumb pagination starts with the album name.\
-Below it are the subdirectories.
+Below it are the subdirectories.\
 ![Chicnado sample gallery](https://i.imgur.com/9CaDQE0.png)
 ![Chicnado sample fullview](https://i.imgur.com/boaXKBV.png)
 ![Chicnado sample generator](https://i.imgur.com/agqMSrV.png)
 
 ### License
 [MIT License](LICENSE.txt)
-
