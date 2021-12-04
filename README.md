@@ -59,5 +59,8 @@ Below it are the subdirectories.\
 ![Chicnado sample fullview](https://i.imgur.com/boaXKBV.png)
 ![Chicnado sample generator](https://i.imgur.com/agqMSrV.png)
 
+### Live Demo
+[https://suroku.com/chicnado/](https://suroku.com/chicnado/)
+
 ### License
 [MIT License](LICENSE.txt)
