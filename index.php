@@ -26,7 +26,7 @@ echo '<!DOCTYPE html>
 <meta name=viewport content="width=device-width">
 </head><body><div class=header>';
 foreach($path as $dir) {$x.=$dir.'/'; echo '<a href="?album='.$x.'">'.$dir.'</a> / ';} //breadcrumb pagination
-echo '<select onchange="window.location.search=\'?album=\'+new URLSearchParams(location.search).get(\'album\')+\'&saf=\'+this.value;"><option value=def>Sort / Filter</option><option value=def>Default</option><option value=alpha>Alphabetical</option><option value=mod>Newest</option><option value=size>Filesize</option><option value=rand>Random</option><option value=port>Portrait</option><option value=land>Landscape</option></select></div>'; //sort and filter select menu
+echo '<select onchange="sortFilter(this.value)"><option value=def>Sort / Filter</option><option value=def>Default</option><option value=alpha>Alphabetical</option><option value=mod>Newest</option><option value=size>Filesize</option><option value=rand>Random</option><option value=port>Portrait</option><option value=land>Landscape</option></select></div>'; //sort and filter select menu
 
 if(is_dir('galleries/'.$album)) { //get list of images
   $list = [];

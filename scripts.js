@@ -37,6 +37,12 @@ function pausePlay() {
   else clearInterval(carousel);
 }
 
+function sortFilter(sort) {
+  uri = new URLSearchParams(location.search);
+  uri.set('saf',sort);
+  location.search = uri;
+}
+
 function fullscreen(fs=1) {
   if (document.fullscreenElement == null) {
     if (fs === 1) {
