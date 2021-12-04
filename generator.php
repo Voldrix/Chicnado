@@ -28,7 +28,6 @@ if(array_key_exists('imgdir',$_POST)) { //create album
     symlink($imgDir,'galleries/'.$albumName);
     if($genThumbs) { //make thumbnails
       mkdir('thumbnails/'.$albumName,0777);
-      $fails = [];
       if(file_exists('thumbnails/'.$albumName)) makeThumbs($imgDir,'thumbnails/'.$albumName,$fails);
       exit();
     }
@@ -75,7 +74,7 @@ function makeThumbs($source,$dest,&$fails) { //make thumbnails
                          break; //else into jpg like normal
           }
           if($tmpImg)
-            imagejpeg(imagescale($tmpImg,-1,268,IMG_BICUBIC),$imgThumb,80); //scale and save thumbnail
+            imagejpeg(imagescale($tmpImg,floor((268/$y)*$x),268,IMG_BICUBIC),$imgThumb,80); //scale and save thumbnail
           else $fails[] = $img;
           unset($tmpImg);
         }
@@ -126,11 +125,6 @@ if(is_dir('galleries') && $dir = opendir('galleries')) { //list existing albums
   closedir($dir);
 }
 else echo '<i style="display:block;text-align:center;">none</i>';
-if($fails) { //corrupted images or wrong extensions
-  echo '<h2>Failed Images</h2>';
-  foreach($fails as $fail)
-    echo $fail.'<br>';
-}
 ?>
 </div><script>
 function newAlbum() { //create album
