@@ -1,11 +1,12 @@
 # Chicnado
 ### _Minimalist, pure PHP, static image gallery_
 No external libraries!\
-Only uses PHP-GD extension (if you generate thumbnails).\
-Simple as `apt-get install php-gd` 
+Only uses php-gd extension (if you generate thumbnails).\
+Install: `apt-get install php-gd` 
 
 ## Features
-- __No external dependancies!__
+- __No external libraries!__
+- Seamless integration (no branding, doesn't look like a separate app)
 - Optional thumbnail generation
 - Minimal code base (easy to edit)
 - Read-only interface has no UI clutter
@@ -38,7 +39,7 @@ PHP will not timeout, because the timeout is overwritten in the code.
 
 ### Security
 After you've added your galleries, __delete generator.php__\
-You can always re-downloaded it, but if you leave it on there, anyone can use it to access any files your web server user has access to.
+You can always re-downloaded it, but if you leave it on there, someone could use it to access any files your web server user has access to.
 
 ## How it Works
 The generator will create two directories, _galleries_ and _thumbnails_. Every gallery you make will be a symlink under _galleries_. If you generate thumbnails, they will be in a folder by the same name under _thumbnails_. Otherwise it will be a duplicate symlink under _thumbnails_.
