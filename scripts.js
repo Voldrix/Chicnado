@@ -29,6 +29,9 @@ function turnPage(previousOrNext) {
   if (imgIndex > images.length) imgIndex = 1;
   if (imgIndex < 1) imgIndex = images.length;
   fullViewImg.src = images[imgIndex-1].getAttribute('src').replace('thumbnails/','galleries/');
+  //preload next image
+  if (previousOrNext < 0 && imgIndex > 1) (new Image()).src = images[imgIndex-2].getAttribute('src').replace('thumbnails/','galleries/');
+  if (previousOrNext >= 0 && imgIndex < images.length) (new Image()).src = images[imgIndex].getAttribute('src').replace('thumbnails/','galleries/');
 }
 
 function pausePlay() {
