@@ -1,7 +1,7 @@
 var fullViewImg = document.getElementById('fullViewImg');
 var viewerbg = document.getElementById('vwr');
 var images = document.getElementsByClassName('YvY');
-var imgIndex = 1, carousel, paused = false;
+var imgIndex = 1, carousel, backOrForward, paused = false;
 
 viewerbg.addEventListener('click',function(event) {if (event.target.id === 'vwr') {fullscreen(0); viewer('none');}},false); //click background to close viewer
 document.addEventListener('keydown',event => {
@@ -25,13 +25,11 @@ function viewer(openOrClose,pageNum=1) {
 }
 
 function turnPage(previousOrNext) {
+  backOrForward = previousOrNext;
   imgIndex += previousOrNext;
   if (imgIndex > images.length) imgIndex = 1;
   if (imgIndex < 1) imgIndex = images.length;
   fullViewImg.src = images[imgIndex-1].getAttribute('src').replace('thumbnails/','galleries/');
-  //preload next image
-  if (previousOrNext < 0 && imgIndex > 1) (new Image()).src = images[imgIndex-2].getAttribute('src').replace('thumbnails/','galleries/');
-  if (previousOrNext >= 0 && imgIndex < images.length) (new Image()).src = images[imgIndex].getAttribute('src').replace('thumbnails/','galleries/');
 }
 
 function pausePlay() {
@@ -56,6 +54,11 @@ function fullscreen(fs=1) {
     var rfs = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen; rfs.call(document);
   }
 }
+
+fullViewImg.addEventListener('load',() => { //preload next image
+  if (backOrForward < 0 && imgIndex > 1) (new Image()).src = images[imgIndex-2].getAttribute('src').replace('thumbnails/','galleries/');
+  if (backOrForward >= 0 && imgIndex < images.length) (new Image()).src = images[imgIndex].getAttribute('src').replace('thumbnails/','galleries/');
+});
 
 //Swipe Gestures
 var xDown, swipe = 0;
