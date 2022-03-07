@@ -15,9 +15,10 @@ if(array_key_exists('removeAlbum',$_POST)) { //remove album
   }
   exit();
 }
-if(array_key_exists('imgdir',$_POST)) { //create album
+
+if(array_key_exists('imgdir',$_POST) && $_POST['refresh'] === 'false') { //create album
   $imgDir = str_replace(array('\\','"','$'),'',$_POST['imgdir']);
-  $albumName = trim(str_replace(array('\\','/','"','\'','$',';','?','#','<','>'),'',$_POST['aname']));
+  $albumName = trim(str_replace(array('\\','/','"','$',';','?','#','<','>'),'',$_POST['aname']));
   $genThumbs = (array_key_exists('genthumbs',$_POST) && $_POST['genthumbs'] == 1) ? true : false;
   if(substr($imgDir,-1) === '/') $imgDir = substr($imgDir,0,-1);
 
@@ -26,22 +27,45 @@ if(array_key_exists('imgdir',$_POST)) { //create album
     if(!is_dir('galleries')) mkdir('galleries',0777);
     if(!is_dir('thumbnails')) mkdir('thumbnails',0777);
     symlink($imgDir,'galleries/'.$albumName);
-    if($genThumbs) { //make thumbnails
+    if($genThumbs) { //thumbnails
       mkdir('thumbnails/'.$albumName,0777);
-      if(file_exists('thumbnails/'.$albumName)) makeThumbs($imgDir,'thumbnails/'.$albumName,$fails);
+      if(file_exists('thumbnails/'.$albumName)) makeThumbs($imgDir,'thumbnails/'.$albumName);
       exit();
     }
     else //symlink instead of thumbs
       symlink($imgDir,'thumbnails/'.$albumName);
   }
 }
-function makeThumbs($source,$dest,&$fails) { //make thumbnails
+
+if(isset($_POST['refresh']) && $_POST['refresh'] !== 'false') { //refresh album
+  $albumName = trim(str_replace(array('\\','/','"','$',';','?','#','<','>'),'',$_POST['refresh']));
+  $imgDir = 'galleries/'.$albumName;
+  if(substr($imgDir,-1) === '/') $imgDir = substr($imgDir,0,-1);
+  clearstatcache();
+  if(empty($albumName) || !is_dir($imgDir) || is_link('thumbnails/'.$albumName)) exit();
+  if(file_exists('thumbnails/'.$albumName)) makeThumbs($imgDir,'thumbnails/'.$albumName); //thumbnails
+  ///delete unneeded thumbnails
+  foreach ($iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('thumbnails/'.$albumName,RecursiveDirectoryIterator::SKIP_DOTS),RecursiveIteratorIterator::SELF_FIRST) as $img) {
+    if(is_file($img)) {
+      if(!is_file($imgDir.'/'.$iterator->getSubPathname())) unlink($img);
+    }
+  }
+  foreach ($iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('thumbnails/'.$albumName,RecursiveDirectoryIterator::SKIP_DOTS),RecursiveIteratorIterator::CHILD_FIRST) as $img) {
+    if(is_dir($img)) {
+      if(!(new FilesystemIterator($img))->valid()) rmdir($img);
+    }
+  }
+  exit();
+}
+
+function makeThumbs($source,$dest) { //make thumbnails
   set_time_limit(0);
   foreach ($iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source,RecursiveDirectoryIterator::SKIP_DOTS),RecursiveIteratorIterator::SELF_FIRST) as $img) {
-    if(is_dir($img))
-      mkdir($dest.'/'.$iterator->getSubPathname());
+    if(is_dir($img)) {
+      if(!is_dir($dest.'/'.$iterator->getSubPathname())) mkdir($dest.'/'.$iterator->getSubPathname());}
     else {
       $imgThumb = $dest.'/'.$iterator->getSubPathname();
+      if(is_file($imgThumb)) continue;
       $imgExt = strtolower(pathinfo($imgThumb,PATHINFO_EXTENSION));
       $supportedFormats = ['bmp','jpg','jpeg','png','gif','webp','svg'];
       if(in_array($imgExt,$supportedFormats,true)) {
@@ -59,7 +83,7 @@ function makeThumbs($source,$dest,&$fails) { //make thumbnails
                          $webp_header = unpack('A4Riff/I1Filesize/A4Webp/A4Vp/A74Chunk',$data);
                          fclose($webpFile); unset($webpFile); unset($data);
                          if(!isset($webp_header['Riff']) || strtoupper($webp_header['Riff']) !== 'RIFF' || !isset($webp_header['Webp']) || strtoupper($webp_header['Webp']) !== 'WEBP' || !isset($webp_header['Vp']) || strpos(strtoupper($webp_header['Vp']),'VP8') === false) {
-                           $fails[] = $img; continue 2;} //invalid webp
+                           echo $img.'<br>'; continue 2;} //invalid webp
                          if(strpos(strtoupper($webp_header['Chunk']),'ANIM') !== false || strpos(strtoupper($webp_header['Chunk']),'ANMF') !== false) { //is animated
                            copy($img,$imgThumb); //can't re-encode these
                            continue 2;}
@@ -75,7 +99,7 @@ function makeThumbs($source,$dest,&$fails) { //make thumbnails
           }
           if($tmpImg)
             imagejpeg(imagescale($tmpImg,floor((268/$y)*$x),268,IMG_BICUBIC),$imgThumb,80); //scale and save thumbnail
-          else $fails[] = $img;
+          else echo $img.'<br>';
           unset($tmpImg);
         }
         else //too small to resize
@@ -85,7 +109,6 @@ function makeThumbs($source,$dest,&$fails) { //make thumbnails
       //else not a supported format. we could copy the img over without resizing, but skipping these saves us from non-images
     }
   }
-  echo implode('<br>',$fails);
 }
 ?>
 <!DOCTYPE html>
@@ -104,7 +127,7 @@ h2 {display:block;font-size:22px;padding:0 12px;background-color:var(--primeColo
 .main {box-shadow:0 0 8px 0px #000 inset;text-align:center;padding:16px 0;}
 .albumLink {display:block;background-color:#444;padding:4px 10px;margin:6px;border-bottom:1px solid black;border-radius:5px;}
 .albumLink:hover {background-color:#555;}
-span {float:right;font-size:24px;line-height:24px;}
+span {float:right;font-size:24px;line-height:24px;padding:0 2px;}
 span:hover {color:#FF7777;}
 </style>
 </head><body><div class=container id=container>
@@ -115,63 +138,70 @@ Image Directory<input type=text id=imgdir placeholder='/absolute/path/' pattern=
 Album Name<input type=text id=aname placeholder='Album Name' pattern='[^\\/\x22\x27$;<>?#]+' title="Disallowed Characters: \ / '' ' $ ; ? # < >" required name=aname /><br>
 <input type=checkbox id=cb name=genthumbs value=1><label for=cb> Generate Thumbnails</label>
 <input type=submit id=sub value=Generate>
-</form></div>
-<h2>Albums</h2>
+</form>
+<p id=msg></p>
+</div>
+<h2 id=albums>Albums</h2>
 <?php
 if(is_dir('galleries') && $dir = opendir('galleries')) { //list existing albums
   while($folder = readdir($dir))
     if(is_dir('galleries/'.$folder) && $folder !== '.' && $folder !== '..')
-      echo '<a href="index.php?album='.$folder.'/" class=albumLink name="'.$folder.'">'.$folder.'<span onclick=\'event.preventDefault();removeAlbum("'.$folder.'")\'>&#128465;</span></a>';
+      echo '<a href="index.php?album='.$folder.'/" class=albumLink name="'.$folder.'">'.$folder.'<span onclick=\'event.preventDefault();removeAlbum("'.$folder.'")\'>&#128465;</span><span onclick=\'event.preventDefault();newAlbum("'.$folder.'")\'>&#8635;</span></a>';
   closedir($dir);
 }
 else echo '<i style="display:block;text-align:center;">none</i>';
 ?>
-</div><script>
-function newAlbum() { //create album
+</div>
+<script>
+function newAlbum(refresh=false) { //create or refresh album
   document.getElementById('sub').disabled = true;
   var imgdir = document.getElementById('imgdir').value.trim();
   var aname = document.getElementById('aname').value.trim();
   var cb = (document.getElementById('cb').checked) ? 1 : 0;
 
-  if(cb === 0) {document.getElementById('albumform').submit(); return true;}
+  if(cb === 0 && !refresh) {document.getElementById('albumform').submit(); return true;}
 
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if(this.readyState === 4) {
-      if(this.status === 200) {
-        msg.remove();
-        document.getElementById('sub').disabled = false;
-        var newAlbumLink = document.createElement('a');
-        newAlbumLink.setAttribute('class','albumLink');
-        newAlbumLink.setAttribute('href','index.php?album='+aname+'/');
-        newAlbumLink.setAttribute('name',aname);
-        newAlbumLink.innerHTML = aname + '<span onclick=\'event.preventDefault();removeAlbum("'+aname+'")\'>&#128465;</span>';
-        document.getElementById('container').insertAdjacentElement('beforeend',newAlbumLink);
-        var fails = this.responseText.trim();
-        if(fails.length > 1)
-          document.getElementById('container').innerHTML += '<h2>Failed Images</h2>'+fails;
-      }
-      else alert('Connection closed\nhttp return code: '+this.status+'\n(0 means nginx/apache timeout. see readme.)');
+  var errbox = document.getElementById('container');
+  errbox.innerHTML += '<h2>Failed Images</h2>';
+
+  fetch(location.toString(), {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'Cache-Control': 'no-store'},
+    body: 'imgdir='+encodeURIComponent(imgdir)+'&aname='+encodeURIComponent(aname)+'&genthumbs='+cb+'&refresh='+refresh
+  })
+  .then(async (response) => {
+    const decoder = new TextDecoder();
+    const reader = response.body.getReader();
+    while(true) {
+      const {value, done} = await reader.read();
+      if(done) break;
+      errbox.innerHTML += decoder.decode(value,{stream: true}).trim(); //append img transcoding errors
     }
-  }
-  xhttp.open('POST','generator.php',true);
-  xhttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-  xhttp.send('imgdir='+encodeURIComponent(imgdir)+'&aname='+encodeURIComponent(aname)+'&genthumbs=1');
+    reader.releaseLock();
+    document.getElementById('msg').innerText = 'Done!';
+    document.getElementById('sub').disabled = false;
+    if(!refresh) {
+      var newAlbumLink = document.createElement('a'); //new album tile
+      newAlbumLink.setAttribute('class','albumLink');
+      newAlbumLink.setAttribute('href','index.php?album='+aname+'/');
+      newAlbumLink.setAttribute('name',aname);
+      newAlbumLink.innerHTML = aname + '<span onclick=\'event.preventDefault();removeAlbum("'+aname+'")\'>&#128465;</span><span onclick=\'event.preventDefault();newAlbum("'+aname+'")\'>&#8635;</span>';
+      document.getElementById('albums').insertAdjacentElement('afterend',newAlbumLink);
+    }
+  })
+  .catch(err => document.getElementById('msg').innerHTML = 'Connection failed<br>'+err+'<br><br>(possibly nginx/apache timeout. see readme.)');
 
-  var msg = document.createElement('p');
-  msg.innerHTML = 'This may take several minutes or longer if you have a large collection.<br>Do not close this page';
-  document.getElementById('main').insertAdjacentElement('beforeend',msg);
+  document.getElementById('msg').innerHTML = 'This may take several minutes or longer if you have a large collection.<br>Do not close this page';
   return false;
 }
 
 function removeAlbum(album) { //remove album
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if(this.readyState === 4 && this.status === 200)
-        document.querySelector('a[name="'+album+'"]').remove();
-  }
-  xhttp.open('POST','generator.php',true);
-  xhttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-  xhttp.send('removeAlbum='+encodeURIComponent(album));
+  fetch(location.toString(), {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'Cache-Control': 'no-store'},
+    body: 'removeAlbum='+encodeURIComponent(album)
+  })
+  .then(document.querySelector('a[name="'+album+'"]').remove())
+  .catch(err => alert('Remove failed\nERROR: '+err));
 }
 </script></body></html>
