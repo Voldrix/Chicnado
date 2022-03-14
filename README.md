@@ -1,12 +1,13 @@
 # Chicnado
 ### _Minimalist, pure PHP, static image gallery_
+__Seamless integration into any site, with no branding of its own.__\
 No external libraries!\
 Only uses php-gd extension (if you generate thumbnails).\
 Install: `apt-get install php-gd` 
 
 ## Features
-- __No external libraries!__
-- Seamless integration (no branding, doesn't look like a separate app)
+- Seamless integration (no branding, does not look like a separate app)
+- No external libraries!
 - Optional thumbnail generation
 - Minimal code base (easy to edit)
 - Read-only interface has no UI clutter
