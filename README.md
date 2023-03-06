@@ -61,7 +61,7 @@ Below it are the subdirectories.\
 ![Chicnado sample generator](https://i.imgur.com/agqMSrV.png)
 
 ### Live Demo
-[https://suroku.com/chicnado/](https://suroku.com/chicnado/)
+[https://voldrixia.com/chicnado/](https://voldrixia.com/chicnado/)
 
 ### License
 [MIT License](LICENSE.txt)

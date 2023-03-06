@@ -1,5 +1,5 @@
 <?php
-if(array_key_exists('album',$_GET)) {
+if(array_key_exists('album',$_GET) && !empty($_GET['album'])) {
   $album = str_replace(array('\\','"','$',';','?','#','<','>'),'',$_GET['album']);
   if(substr($album,-1) !== '/') $album.='/';
 }
