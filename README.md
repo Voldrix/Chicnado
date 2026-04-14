@@ -1,23 +1,22 @@
 # Chicnado
 ### _Minimalist, pure PHP, static image gallery_
-__Seamless integration into any site, with no branding of its own.__\
-No external libraries!\
-Only uses php-gd extension (if you generate thumbnails).\
+__Seamless integration into any site, with no branding of its own.__
+
+Requires: php-gd extension (if you generate thumbnails).\
 Install: `apt-get install php-gd` 
 
 ## Features
 - Seamless integration (no branding, does not look like a separate app)
-- No external libraries!
+- No external libraries
 - Optional thumbnail generation
-- Minimal code base (easy to edit)
+- Simple vanilla code base
 - Read-only interface has no UI clutter
 - Multiple Albums
 - Sort and filter (mod time, file size, alphabetical, random, unordered) (portrait, landscape)
-- Auto resizing to fill rows evenly
 
 ## Instructions
 Just clone the repo into a folder on your web server. Then go to that URL for setup.\
-After you add your first gallery, you'll have to go to the `generator.php` page to add or remove galleries.\
+After you've added your first gallery, you'll have to go to the `generator.php` page manually to add or remove galleries.\
 Removing a gallery will remove the symlink and delete any generated thumbnails, but not touch the originals.
 
 ### Controls
@@ -25,33 +24,27 @@ Removing a gallery will remove the symlink and delete any generated thumbnails, 
 - `F` Fullscreen / unFullscreen
 - `ESC` unFullscreen / Close image
 - `Left` Previous image
-- `Right` Next image
-- `Any` Next image
-
-On mobile there is a swipe gesture for cycling the fullview image.\
-There are also button controls for the fullview image viewer. Clicking the grayed-out background also closes the image.\
-You can manually cycle images while the carousel is on.
-
-### Nginx timeout
-If thumbnail generation takes longer than 5min, nginx may close the connection. Add this setting to your site's config to increase the timeout to one hour.\
-`proxy_read_timeout 3600;`
-
-PHP will not timeout, because the timeout is overwritten in the code.
+- `Right` `Space` `Enter` Next image
+- `Click` zoom image
+- `Ctrl` + `Click` super zoom image
 
 ### Security
 After you've added your galleries, __delete generator.php__\
-You can always re-downloaded it, but if you leave it on there, someone could use it to access any files your web server user has access to.
+You can always re-downloaded it, but if you leave it on there, someone could create a gallery to any directory and access your files.
 
 ## How it Works
-The generator will create two directories, _galleries_ and _thumbnails_. Every gallery you make will be a symlink under _galleries_. If you generate thumbnails, they will be in a folder by the same name under _thumbnails_. Otherwise it will be a duplicate symlink under _thumbnails_.
+Galleries are symlinks to the image directory.\
+Thumbnails are stored in the same directory as Chicnado.
 
-If there is no thumbnail for an image, the viewer will use the original for the thumbnail. This can happen if the image has the wrong file type extension, or the thumbnail was deleted, or a new image was added to the source folder. You will be able to identify these issues because the image will be given a <u>red border</u>.
+Images added since the last thumbnail generation will have a magenta border around them and use the full size image as the thumbnail.
 
-The viewer gets the file list from the source folder, so any changes you make will show up instantly.
+Thumbnail formats supported: gif, jpg, png, bmp, webp
 
-Any non-images in the source directory will show up as broken images.
+SVGs and images smaller than the thumbnail size will be copied -not transcoded- into a thumbnail.
 
-Images shorter than the thumbnail height (default 268px) will be copied -not transcoded- into a thumbnail.
+The file list is read from the source folder, so any changes will show up instantly.
+
+Non-images display as blank with a red border.
 
 ## Pictures
 The top left breadcrumb pagination starts with the album name.\
