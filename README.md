@@ -54,7 +54,7 @@ Below it are the subdirectories.\
 ![Chicnado sample generator](https://i.imgur.com/agqMSrV.png)
 
 ### Live Demo
-[https://voldrixia.com/chicnado/](https://voldrixia.com/chicnado/)
+[https://voldrixia.com/chicnado/](https://voldrixia.com/chicnado/?album=Chicnado+Demo%2F)
 
 ### License
 [MIT License](LICENSE.txt)
