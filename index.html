@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang=en><head><meta charset=utf-8>
+<link rel=icon href=/favicon.ico>
+<link rel=stylesheet href=style.css>
+<meta name=viewport content="width=device-width">
+<title>Image Gallary</title>
+<script src=scripts.js defer></script>
+</head><body>
+
+<div class=header>
+  <div id=breadcrumbs></div>
+  <div class=optionsBar>
+    <select onchange=orientation() id=rowsOrColsBtn>
+      <option value=cols>Columns</option><option value=rows>Rows</option>
+    </select>
+    <select onchange="sort(true);render(album)" id=sortBtn>
+      <option value=''>Sort</option><option value=def>Default</option><option value=name>Alphabetical</option><option value=mtime>Newest</option><option value=size>Filesize</option><option value=rand>Random</option>
+    </select>
+    <select onchange=filter(this.value) id=filterBtn>
+      <option value=''>Filter</option><option value=port>Portrait</option><option value=land>Landscape</option>
+    </select>
+  </div>
+  <div class=floatClearBar></div>
+</div>
+
+<div id=albumContainer>
+  <h1>Albums</h1>
+  <div id=albumList></div>
+</div>
+
+<div class=dirs id=dirs></div>
+<div class=picsRow id=picsRow></div>
+<div class=picsCol id=picsCol></div>
+
+<div class=viewer id=viewerbg tabindex=-1>
+  <img id=fullViewImg onclick=zoomImg()>
+  <span fullscreen onclick=fullscreenToggle('toggle')>&#8689;</span>
+  <span previous onclick=turnPage(-1)>&#8249;</span>
+  <span next onclick=turnPage(1)>&#8250;</span>
+  <span close onclick=fullscreenToggle('close');viewer('close',0,false)>&times;</span>
+  <span carousel onclick=pausePlay() id=pausePlayBtn>&#10157;</span>
+</div>
+
+</body></html>
+
