@@ -55,7 +55,7 @@ function getAlbums() {
         location.href = 'generator.php';
       }
       for(a of _albums) {
-        albumList.innerHTML += `<a href="?album=${a}/" class=albumLink onclick='navigate("${a}/")'>${a}</a>`;
+        albumList.insertAdjacentHTML('beforeend', `<a href="?album=${a}/" class=albumLink onclick='navigate("${a}/")'>${a}</a>`);
       }
       albumContainer.style.display = 'inline-block';
     }
@@ -186,13 +186,13 @@ async function render(_album) {
   let cumulative = '';
   for(a of _album.split('/')) { //breadcrumbs
     cumulative += a + '/';
-    if(a) breadcrumbs.innerHTML += `<a href="?album=${cumulative}" onclick='navigate("${cumulative}")'>${a}</a> / `;
+    if(a) breadcrumbs.insertAdjacentHTML('beforeend', `<a href="?album=${cumulative}" onclick='navigate("${cumulative}")'>${a}</a> / `);
   }
 
   if(!files || _album !== album || winWidth !== window.innerWidth) return;
 
   for(d of files.dirs) { //directories
-    dirs.innerHTML += `<a href="?album=${_album}${d.name}/" onclick='navigate("${_album}${d.name}/")'>${d.name}</a>`;
+    dirs.insertAdjacentHTML('beforeend', `<a href="?album=${_album}${d.name}/" onclick='navigate("${_album}${d.name}/")'>${d.name}</a>`);
   }
 
   var domPTR = picsRow;
@@ -224,9 +224,9 @@ async function render(_album) {
     var thumbnail = (err === 1) ? 'galleries' : 'thumbnails';
     var border = (err === 1) ? 'style="border:5px solid #B0B;"' : '';
     if(err === 2) //invalid file
-      domPTR.innerHTML += `<div class=imgErrContainer><span>${f.name}</span></div>`;
+      domPTR.insertAdjacentHTML('beforeend', `<div class=imgErrContainer><span>${f.name}</span></div>`);
     else //img thumbnail
-      domPTR.innerHTML += `<div class=imgContainer><img src="${thumbnail}/${_album}${f.name}" onclick=viewer('open',${imgIndex},false) ${border} onerror='this.onerror=null;this.src="galleries/${_album}${f.name}";this.style.border="5px solid #0BB"'><span>${f.name}</span></div>`;
+      domPTR.insertAdjacentHTML('beforeend', `<div class=imgContainer><img src="${thumbnail}/${_album}${f.name}" onclick=viewer('open',${imgIndex},false) ${border} onerror='this.onerror=null;this.src="galleries/${_album}${f.name}";this.style.border="5px solid #0BB"'><span>${f.name}</span></div>`);
     imgIndex += 1;
   }
 }
